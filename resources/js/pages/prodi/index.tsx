@@ -128,7 +128,7 @@ export default function ProdiIndex({ prodi, filters }: ProdiIndexProps) {
                     </thead>
                     <tbody>
                         {table.getRowModel().rows.map((row) => (
-                            <tr key={row.id} className="border-b bg-white dark:border-gray-700 dark:bg-gray-800">
+                            <tr key={row.id} className="border-b bg-white hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800">
                                 {row.getVisibleCells().map((cell) => (
                                     <td key={cell.id} className="px-6 py-4">
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}

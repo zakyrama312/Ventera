@@ -67,11 +67,9 @@ const AppHeader: React.FC = () => {
                             </svg>
                         )}
                     </button>
-
-                    {/* 👈 [2] Ganti 'to' menjadi 'href' dan gunakan helper 'route()' */}
                     <Link href={route('dashboard')} className="lg:hidden">
-                        <img className="dark:hidden" src="./images/logo/logo.svg" alt="Logo" />
-                        <img className="hidden dark:block" src="./images/logo/logo-dark.svg" alt="Logo" />
+                        <img className="dark:hidden" src="/images/logo-png/ventera-logo.png" alt="Ventera Logo" />
+                        <img className="hidden dark:block" src="/images/logo-png/ventera-logo-dark.png" alt="Ventera Logo Dark" />
                     </Link>
 
                     <button
@@ -94,9 +92,9 @@ const AppHeader: React.FC = () => {
                     </div>
                 </div>
                 <div
-                    className={`${isApplicationMenuOpen ? 'flex' : 'hidden'} shadow-theme-md w-full items-center justify-between gap-4 px-5 py-4 lg:flex lg:justify-end lg:px-0 lg:shadow-none`}
+                    className={`${isApplicationMenuOpen ? 'flex' : 'hidden'} w-full items-center justify-between gap-4 px-5 py-4 shadow-theme-md lg:flex lg:justify-end lg:px-0 lg:shadow-none`}
                 >
-                    <div className="2xsm:gap-3 flex items-center gap-2">
+                    <div className="flex items-center gap-2 2xsm:gap-3">
                         <ThemeToggleButton />
                         <NotificationDropdown />
                     </div>

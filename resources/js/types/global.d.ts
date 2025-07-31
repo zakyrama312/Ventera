@@ -1,5 +1,6 @@
 import type { route as routeFn } from 'ziggy-js';
 import { PageProps as InertiaPageProps } from '@inertiajs/core';
+import { PageProps } from '@inertiajs/inertia';
 
 // === TIPE UNTUK PROPS INERTIA (YANG BARU) ===
 export type User = {
@@ -19,4 +20,12 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
 // === TIPE UNTUK ZIGGY (YANG SUDAH ADA, JANGAN DIHAPUS) ===
 declare global {
     const route: typeof routeFn;
+}
+
+declare module '@inertiajs/inertia' {
+  interface PageProps {
+    flash: {
+      message?: string;
+    };
+  }
 }

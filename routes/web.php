@@ -4,7 +4,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-
+use App\Http\Controllers\KondisiController;
 
 Route::get('/', function () {
     return Inertia::render('AuthPages/SignIn'); // Atau dari Controller
@@ -22,10 +22,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('users.index');
 
     Route::resource('/prodi', ProdiController::class);
+    Route::resource('/kondisi', KondisiController::class);
 
-    Route::get('/kondisi', function () {
-        return Inertia::render('Kondisi/Index');
-    })->name('kondisi.index');
 
     Route::get('/ruang', function () {
         return Inertia::render('Ruang/Index');
