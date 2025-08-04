@@ -3,7 +3,7 @@ import Input from '@/components/form/input/InputField';
 import Label from '@/components/form/Label';
 import Button from '@/components/ui/button/Button';
 import { Modal } from '@/components/ui/modal/index'; // pastikan path-nya sesuai
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { FormEventHandler, useEffect } from 'react';
 
 interface ProdiModalProps {
@@ -36,6 +36,9 @@ export default function ProdiModal({ isOpen, onClose, prodi }: ProdiModalProps) 
             onSuccess: () => {
                 onClose();
                 reset();
+                router.visit(route('prodi.index'), {
+                    preserveState: false, // 🔥 penting supaya layout & sidebar nge-refresh
+                });
             },
         };
 

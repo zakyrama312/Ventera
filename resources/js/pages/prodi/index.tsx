@@ -58,7 +58,13 @@ export default function ProdiIndex({ prodi, filters }: ProdiIndexProps) {
 
     const deleteProdi = (prodiItem: Prodi) => {
         if (confirm(`Yakin ingin menghapus prodi "${prodiItem.nama_prodi}"?`)) {
-            router.delete(route('prodi.destroy', prodiItem.id));
+            router.delete(route('prodi.destroy', prodiItem.id), {
+                onSuccess: () => {
+                    router.visit(route('prodi.index'), {
+                        preserveState: false,
+                    });
+                },
+            });
         }
     };
 

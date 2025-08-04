@@ -58,7 +58,13 @@ export default function KondisiIndex({ kondisi, filters }: KondisiIndexProps) {
 
     const deleteKondisi = (kondisiItem: Kondisi) => {
         if (confirm(`Yakin ingin menghapus kondisi "${kondisiItem.nama_kondisi}"?`)) {
-            router.delete(route('kondisi.destroy', kondisiItem.id));
+            router.delete(route('kondisi.destroy', kondisiItem.id), {
+                onSuccess: () => {
+                    router.visit(route('kondisi.index'), {
+                        preserveState: false,
+                    });
+                },
+            });
         }
     };
 

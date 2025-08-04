@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
 use App\Models\Kategori;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class KategoriController extends Controller
@@ -10,9 +12,19 @@ class KategoriController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $kategori = Kategori::query()
+            ->when($request->input('search'), function ($query, $search) {
+                $query->where('nama_kategori', 'like', "%{$search}%"); // Ganti nama kolom
+            })
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('kategori/index', [ // Ganti path view ke 'kategori/Index'
+            'kategori' => $kategori,
+            'filters' => $request->only(['search']),
+        ]);
     }
 
     /**
@@ -28,7 +40,14 @@ class KategoriController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate(['nama_kategori' => 'required|string|max:255']); // Ganti validasi
+        Kategori::create([
+            'nama_kategori' => $request->nama_kategori, // Ganti nama field
+            'slug' => Str::slug($request->nama_kategori),
+            'prodi_id' => auth()->user()->prodi_id,
+        ]);
+        return redirect()->route('kategori.index')->with('message', 'Kategori berhasil ditambahkan.'); // Ganti route dan pesan
+
     }
 
     /**
@@ -52,7 +71,12 @@ class KategoriController extends Controller
      */
     public function update(Request $request, Kategori $kategori)
     {
-        //
+        $request->validate(['nama_kategori' => 'required|string|max:255']); // Ganti validasi
+        $kategori->update([
+            'nama_kategori' => $request->nama_kategori,
+            'slug' => Str::slug($request->nama_kategori), // Sebaiknya slug juga diupdate
+        ]);
+        return redirect()->route('kategori.index')->with('message', 'Kategori berhasil diupdate.'); // Ganti route dan pesan
     }
 
     /**
@@ -60,6 +84,7 @@ class KategoriController extends Controller
      */
     public function destroy(Kategori $kategori)
     {
-        //
+        $kategori->delete();
+        return redirect()->route('kategori.index')->with('message', 'Kategori berhasil dihapus.');
     }
 }

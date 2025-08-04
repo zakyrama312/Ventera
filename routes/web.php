@@ -4,6 +4,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\KondisiController;
 
 Route::get('/', function () {
@@ -23,15 +24,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('/prodi', ProdiController::class);
     Route::resource('/kondisi', KondisiController::class);
+    Route::resource('/kategori', KategoriController::class);
 
 
     Route::get('/ruang', function () {
         return Inertia::render('Ruang/Index');
     })->name('ruang.index');
 
-    Route::get('/kategori', function () {
-        return Inertia::render('Kategori/Index');
-    })->name('kategori.index');
 
     // --- Transaksi ---
     Route::get('/barang-masuk', function () {
