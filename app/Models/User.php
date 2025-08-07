@@ -25,6 +25,10 @@ class User extends Authenticatable
         'prodi_id'
     ];
 
+    public function prodi()
+    {
+        return $this->belongsTo(Prodi::class);
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

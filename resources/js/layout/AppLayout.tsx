@@ -1,5 +1,4 @@
 import React from 'react';
-import { Toaster } from 'react-hot-toast';
 import { SidebarProvider, useSidebar } from '../context/SidebarContext';
 import { ThemeProvider } from '../context/ThemeContext';
 import AppHeader from './AppHeader';
@@ -38,10 +37,7 @@ const AppLayout: React.FC<LayoutProps> = ({ children }) => {
     return (
         <ThemeProvider>
             <SidebarProvider>
-                <LayoutContent>
-                    {children}
-                    <Toaster position="top-right" reverseOrder={false} />
-                </LayoutContent>
+                <LayoutContent>{children}</LayoutContent>
             </SidebarProvider>
         </ThemeProvider>
     );

@@ -1,11 +1,15 @@
 import { Link, usePage } from '@inertiajs/react'; // 👈 [1] Impor dari Inertia
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 // Asumsikan ikon-ikon ini sudah diimpor dengan benar
 import { useSidebar } from '../context/SidebarContext';
 import { BoxCubeIcon, BoxIcon, CalenderIcon, ChevronDownIcon, GridIcon, GroupIcon, HorizontaLDots, PageIcon, PieChartIcon, TaskIcon } from '../icons';
 
 // Definisikan tipe untuk item navigasi
+type RuangNav = {
+    nama_ruang: string;
+    slug: string;
+};
 type NavItem = {
     name: string;
     icon: React.ReactNode;
@@ -20,26 +24,14 @@ type NavItem = {
     }[];
 };
 
-const navItems: NavItem[] = [
-    {
-        icon: <GridIcon />,
-        name: 'Dashboard',
-        path: route('dashboard'),
-        routeName: 'dashboard',
-    },
-    {
-        icon: <CalenderIcon />,
-        name: 'Ruang',
-        subItems: [{ name: 'Lab RPL', path: route('users.index'), routeName: 'users.*' }],
-    },
-];
+//
 
 const othersItems: NavItem[] = [
     {
         icon: <GroupIcon />,
         name: 'Pengguna',
-        path: route('users.index'), // contoh: users.index
-        routeName: 'users.*', // contoh: users.* agar aktif di users.create, users.edit
+        path: route('pengguna.index'), // contoh: pengguna.index
+        routeName: 'pengguna.*', // contoh: pengguna.* agar aktif di pengguna.create, pengguna.edit
     },
     {
         icon: <BoxCubeIcon />,
@@ -113,6 +105,7 @@ const laporanItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
     const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
     const { url } = usePage(); // 👈 [2] Gunakan usePage, bukan useLocation
+    const { props } = usePage();
 
     const [openSubmenu, setOpenSubmenu] = useState<{
         type: string;
@@ -121,7 +114,30 @@ const AppSidebar: React.FC = () => {
     const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
     const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-    // 👈 [3] Fungsi isActive sekarang menggunakan helper `route().current()`
+    const navItems: NavItem[] = useMemo(() => {
+        // ✅ Pindahkan logika `nav_ruang` ke dalam useMemo
+        const nav_ruang = (props.nav_ruang as RuangNav[] | undefined) ?? [];
+
+        // ✅ Kembalikan array navItems dari dalam useMemo
+        return [
+            {
+                icon: <GridIcon />,
+                name: 'Dashboard',
+                path: route('dashboard'),
+                routeName: 'dashboard',
+            },
+            {
+                icon: <CalenderIcon />,
+                name: 'Ruang',
+                subItems: nav_ruang.map((ruang) => ({
+                    name: ruang.nama_ruang,
+                    path: route('ruang.data', { ruang: ruang.slug }),
+                    routeName: 'ruang.data',
+                })),
+            },
+        ];
+        // ✅ Ubah dependensi menjadi sumber data aslinya
+    }, [props.nav_ruang]);
     const isActive = (routeName: string | undefined) => {
         if (!routeName) return false;
         return route().current(routeName);
@@ -148,7 +164,7 @@ const AppSidebar: React.FC = () => {
         // if (!submenuMatched) {
         //   setOpenSubmenu(null);
         // }
-    }, [url]);
+    }, [url, navItems]);
 
     // Efek untuk mengkalkulasi tinggi submenu saat dibuka
     useEffect(() => {

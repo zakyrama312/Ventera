@@ -41,3 +41,19 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+// resources/js/types/index.d.ts
+
+export type Prodi = {
+    id: number;
+    nama_prodi: string;
+};
+
+export type Pengguna = {
+    id: number;
+    name: string;
+    username: string;
+    role: 'admin' | 'anggota' | 'kaprodi';
+    prodi: Prodi; // Relasi ke prodi
+    prodi_id: number;
+};

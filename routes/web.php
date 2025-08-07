@@ -3,9 +3,12 @@
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProdiController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\RuangController;
 use App\Http\Controllers\KondisiController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\PenggunaController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\BarangController;
 
 Route::get('/', function () {
     return Inertia::render('AuthPages/SignIn'); // Atau dari Controller
@@ -22,20 +25,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('users/index'); // Contoh path komponen
     })->name('users.index');
 
+    Route::resource('/pengguna', PenggunaController::class);
     Route::resource('/prodi', ProdiController::class);
     Route::resource('/kondisi', KondisiController::class);
     Route::resource('/kategori', KategoriController::class);
-
-
-    Route::get('/ruang', function () {
-        return Inertia::render('Ruang/Index');
-    })->name('ruang.index');
-
+    Route::resource('/ruang', RuangController::class);
+    Route::get('/ruang/{ruang:slug}', [RuangController::class, 'show'])
+        ->name('ruang.data');
 
     // --- Transaksi ---
-    Route::get('/barang-masuk', function () {
-        return Inertia::render('Transaksi/BarangMasuk');
-    })->name('barang-masuk.index');
+    Route::resource('barang-masuk', BarangController::class);
 
     Route::get('/peminjaman', function () {
         return Inertia::render('Transaksi/Peminjaman');

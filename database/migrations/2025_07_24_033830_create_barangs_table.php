@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('ruang_id')->constrained('ruang')->onDelete('cascade');
             $table->string('nama_barang')->unique();
             $table->string('slug')->unique();
-            $table->string('kode_barang')->unique();
+            $table->string('kode_barang')->unique()->nullable();
             $table->string('merk')->nullable();
             $table->string('ukuran')->nullable();
             $table->string('bahan')->nullable();
@@ -27,7 +27,7 @@ return new class extends Migration
             // $table->integer('stok_masuk');
             // $table->integer('stok_keluar');
             $table->date('tahun_pengadaan')->nullable();
-            $table->text('keterangan');
+            $table->text('keterangan')->nullable();
             $table->timestamps();
         });
     }
