@@ -3,9 +3,12 @@ import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import Input from '@/components/form/input/InputField';
 import Button from '@/components/ui/button/Button';
 import AppLayout from '@/layout/AppLayout';
+import type { BarangDetail } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Search } from 'lucide-react';
+import axios from 'axios'; // Untuk mengambil data detail
+import { Eye, Search, SquarePen, Trash } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
+import BarangDetailModal from './BarangDetailModal';
 
 // Definisikan tipe datanya
 type Kondisi = { id: number; nama_kondisi: string };
@@ -34,6 +37,24 @@ interface IndexProps {
 
 export default function BarangMasukIndex({ barangMasuk, filters }: IndexProps) {
     const [search, setSearch] = useState(filters.search || '');
+    // ✅ State untuk modal detail
+    const [isDetailOpen, setIsDetailOpen] = useState(false);
+    const [detailData, setDetailData] = useState<BarangDetail | null>(null);
+
+    // ✅ Fungsi untuk membuka modal dan mengambil data detail
+    const openDetailModal = (item: BarangMasuk) => {
+        axios.get(route('barang-masuk.show', item.barang.id)).then((response) => {
+            setDetailData(response.data);
+            setIsDetailOpen(true);
+        });
+    };
+
+    // ✅ Fungsi untuk menghapus data
+    const handleDelete = (item: BarangMasuk) => {
+        if (confirm(`Yakin ingin menghapus "${item.barang.nama_barang}"?`)) {
+            router.delete(route('barang-masuk.destroy', item.barang.id));
+        }
+    };
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             // Kirim request ke server dengan nilai search baru
@@ -70,6 +91,7 @@ export default function BarangMasukIndex({ barangMasuk, filters }: IndexProps) {
                             <th className="px-6 py-3 text-center">Jumlah Masuk</th>
                             <th className="px-6 py-3 text-center">Kondisi</th>
                             <th className="px-6 py-3 text-center">Ruang</th>
+                            <th className="px-6 py-3 text-center">Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -81,6 +103,20 @@ export default function BarangMasukIndex({ barangMasuk, filters }: IndexProps) {
                                 <td className="px-6 py-4 text-center">{item.stok_masuk}</td>
                                 <td className="px-6 py-4 text-center">{item.barang.kondisi.nama_kondisi}</td>
                                 <td className="px-6 py-4 text-center">{item.barang.ruang.nama_ruang}</td>
+                                {/* ✅ Tombol-tombol Aksi */}
+                                <td className="px-6 py-4 text-center">
+                                    <div className="flex justify-center gap-2">
+                                        <button onClick={() => openDetailModal(item)} className="text-blue-500 hover:text-blue-700">
+                                            <Eye size={18} />
+                                        </button>
+                                        <Link href={route('barang-masuk.edit', item.barang.id)} className="text-amber-500 hover:text-amber-700">
+                                            <SquarePen size={18} />
+                                        </Link>
+                                        <button onClick={() => handleDelete(item)} className="text-red-500 hover:text-red-700">
+                                            <Trash size={18} />
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
@@ -102,6 +138,11 @@ export default function BarangMasukIndex({ barangMasuk, filters }: IndexProps) {
                         ))}
                     </div>
                 </div>
+                <BarangDetailModal
+                    isOpen={isDetailOpen}
+                    data={detailData} // <-- `data` dioper di sini sebagai prop
+                    onClose={() => setIsDetailOpen(false)} // <-- `onClose` hanya berisi fungsi untuk menutup modal
+                />
             </div>
         </>
     );

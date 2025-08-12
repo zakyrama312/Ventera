@@ -118,7 +118,16 @@ class BarangController extends Controller
      */
     public function show(Barang $barang)
     {
-        //
+        $barang->load(['kategori', 'kondisi', 'ruang', 'prodi']);
+
+        // Hitung total stok saat ini dari tabel barang_stoks
+        $stokTerkini = BarangStoks::where('barang_id', $barang->id)->sum(DB::raw('stok_masuk - stok_keluar'));
+
+        // Kembalikan sebagai JSON
+        return response()->json([
+            'barang' => $barang,
+            'stok' => $stokTerkini,
+        ]);
     }
 
     /**
@@ -126,7 +135,19 @@ class BarangController extends Controller
      */
     public function edit(Barang $barang)
     {
-        //
+        $prodiId = auth()->user()->prodi_id;
+
+        // Ambil data stok masuk awal dari record pertama
+        $barang->load(['barang_stoks' => function ($query) {
+            $query->orderBy('created_at', 'asc')->first();
+        }]);
+
+        return Inertia::render('barang-masuk/edit', [
+            'barang' => $barang,
+            'kategoris' => Kategori::where('prodi_id', $prodiId)->get(),
+            'kondisis' => Kondisi::where('prodi_id', $prodiId)->get(),
+            'ruangs' => Ruang::where('prodi_id', $prodiId)->get(),
+        ]);
     }
 
     /**
@@ -134,7 +155,33 @@ class BarangController extends Controller
      */
     public function update(Request $request, Barang $barang)
     {
-        //
+        $request->validate([
+            'nama_barang' => 'required|string|max:255',
+            'kode_barang' => 'nullable|string|max:255',
+            'kategori_id' => 'required|exists:kategori,id',
+            'kondisi_id' => 'required|exists:kondisi,id',
+            'ruang_id' => 'required|exists:ruang,id',
+            'merk' => 'nullable|string|max:50',
+            'ukuran' => 'nullable|string|max:50',
+            'bahan' => 'nullable|string|max:50',
+            'tahun_pengadaan' => 'nullable|digits:4|integer|min:1900',
+            'keterangan' => 'nullable|string',
+            'spesifikasi' => 'nullable|string',
+            'stok_masuk' => 'required|integer',
+        ]);
+
+        DB::transaction(function () use ($request, $barang) {
+            // 1. Update data di tabel `barangs`
+            $barang->update($request->except('stok_masuk'));
+
+            // 2. Update data stok masuk di record `barang_stoks` yang pertama
+            $stokAwal = $barang->barang_stoks()->orderBy('created_at', 'asc')->first();
+            if ($stokAwal) {
+                $stokAwal->update(['stok_masuk' => $request->stok_masuk]);
+            }
+        });
+
+        return redirect()->route('barang-masuk.index')->with('message', 'Data barang berhasil diupdate.');
     }
 
     /**
@@ -142,6 +189,13 @@ class BarangController extends Controller
      */
     public function destroy(Barang $barang)
     {
-        //
+        DB::transaction(function () use ($barang) {
+            // 1. Hapus semua histori stok yang berhubungan
+            $barang->barang_stoks()->delete();
+            // 2. Hapus data barang itu sendiri
+            $barang->delete();
+        });
+
+        return redirect()->route('barang-masuk.index')->with('message', 'Data barang berhasil dihapus.');
     }
 }

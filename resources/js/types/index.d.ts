@@ -57,3 +57,26 @@ export type Pengguna = {
     prodi: Prodi; // Relasi ke prodi
     prodi_id: number;
 };
+
+export type BarangDetail = {
+    barang: Barang; // Pastikan tipe Barang juga sudah lengkap di file ini
+    stok_masuk: number;
+    total_stok: number;
+    stok_keluar: number;
+};
+
+export type Barang = {
+    id: number;
+    nama_barang: string;
+    kode_barang: string;
+    merk: string;
+    spesifikasi: string;
+    tahun_pengadaan: string;
+    keterangan: string;
+    kondisi: Kondisi; // Relasi ke kondisi
+    kondisi_id: number;
+    kategori: Kategori; // Relasi ke kategori
+    kategori_id: number;
+    ruang: Ruang; // Relasi ke ruang
+    ruang_id: number;
+};
